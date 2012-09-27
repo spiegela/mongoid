@@ -1171,6 +1171,59 @@ describe Mongoid::Contextual::Mongo do
     end
   end
 
+  describe "#aggregate" do
+
+    let!(:depeche_mode) do
+      Band.create(name: "Depeche Mode", likes: 200, genre: "rock")
+    end
+
+    let!(:tool) do
+      Band.create(name: "Tool", likes: 100, genre: "rock")
+    end
+
+    let!(:parliament) do
+      Band.create(name: "Parliament", likes: 50, genre: "funk")
+    end
+
+    let(:group) do
+      { "_id" => "$genre",
+        "totalLikes" => { "$sum" => "$likes" }
+      }
+    end
+
+    context "when no selection is provided" do
+
+      let(:criteria) do
+        Band.all
+      end
+
+      let(:context) do
+        described_class.new(criteria)
+      end
+
+      let(:results) do
+        context.aggregate(group).all
+      end
+
+      it "returns the first aggregate result" do
+        results.should include(
+          { "_id" => "rock", "totalLikes" => 300 }
+        )
+      end
+
+      it "returns the second aggregate result" do
+        results.should include(
+          { "_id" => "funk", "totalLikes" => 50 }
+        )
+      end
+
+      it "returns the correct number of documents" do
+        results.count.should eq(2)
+      end
+    end
+
+  end
+
   describe "#skip" do
 
     let!(:depeche_mode) do

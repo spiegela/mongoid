@@ -5,6 +5,7 @@ require "mongoid/contextual/command"
 require "mongoid/contextual/eager"
 require "mongoid/contextual/find_and_modify"
 require "mongoid/contextual/map_reduce"
+require "mongoid/contextual/aggregate"
 
 module Mongoid
   module Contextual
@@ -256,6 +257,19 @@ module Mongoid
       # @since 3.0.0
       def map_reduce(map, reduce)
         MapReduce.new(collection, criteria, map, reduce)
+      end
+
+      # Initiate a aggregate operation from the context.
+      #
+      # @example Initiate a aggregate.
+      #   context.aggregate(group, unwind=nil)
+      #
+      # @param [ String ] group The group js function
+      # @param [ Symbol ] unwind Document element to unwind
+      #
+      # @return [ Aggregate ] The aggregate lazy wrapper.
+      def aggregate(group, unwind=nil)
+        Aggregate.new(collection, criteria, group, unwind)
       end
 
       # Pluck the single field values from the database. Will return duplicates
